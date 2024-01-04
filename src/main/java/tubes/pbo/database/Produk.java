@@ -36,6 +36,12 @@ public class Produk {
     public void setStok(Integer stok) {
         this.stok = stok;
     }
+    public Integer getId_barang() {
+        return id_barang;
+    }
+    public void setId_barang(Integer id_barang) {
+        this.id_barang = id_barang;
+    }
 
 
 }
