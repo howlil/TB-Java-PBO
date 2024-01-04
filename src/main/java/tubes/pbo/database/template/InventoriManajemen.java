@@ -1,4 +1,4 @@
-package tubes.pbo.database;
+package tubes.pbo.database.template;
 
 public interface InventoriManajemen {
     void addProduk();

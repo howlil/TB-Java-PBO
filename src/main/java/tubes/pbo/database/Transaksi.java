@@ -1,4 +1,5 @@
 package tubes.pbo.database;
+import tubes.pbo.database.template.TransaksiManajemen;
 
 import java.util.Map;
 

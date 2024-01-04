@@ -5,8 +5,10 @@ abstract class Pengguna {
     private String username;
     private String password;
 
-   public Pengguna(String uname, String pw){
-        this.username=uname;
-        this.password=pw;
+    public Pengguna(String uname, String pw) {
+        this.username = uname;
+        this.password = pw;
     }
+
+  
 }

@@ -1,11 +1,12 @@
 package tubes.pbo.database;
+import tubes.pbo.database.template.InventoriManajemen;;
 
 public class Admin extends Pengguna implements InventoriManajemen  {
 
     public Admin(){
         super(null, null);
     };
-    
+
     @Override
     public void addProduk() {
         // TODO Auto-generated method stub
