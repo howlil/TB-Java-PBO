@@ -2,10 +2,10 @@ package tubes.pbo.database.login;
 
 import java.util.Random;
 
-public class Captha {
+public class Captcha {
     private String captcha;
 
-    public Captha() {
+    public Captcha() {
         this.captcha = generatedCode();
     }
 

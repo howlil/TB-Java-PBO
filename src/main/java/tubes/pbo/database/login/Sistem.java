@@ -6,32 +6,35 @@ import tubes.pbo.database.*;;
 
 public class Sistem {
     private Admin admin;
-    private Captha captha;
-    
+    private Captcha captcha;
 
     public Sistem(Admin admin) {
         this.admin = admin;
-        this.captha = new Captha();
+        this.captcha = new Captcha();
     }
-
-    // public boolean check(String username, String password){
-        
-      
-    // }  
 
     public boolean login() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("username : ");
-        String username = scanner.nextLine();
-
-        System.out.print("Password :");
-        String password = scanner.nextLine();
-
-        if(admin.check(username,password)){
-            System.out.println("Masukkan captcha berikut: " + captcha.getCaptcha());
-
+        try {
+            System.out.print("username : ");
+            String username = scanner.nextLine();
+    
+            System.out.print("Password : ");
+            String password = scanner.nextLine();
+    
+            if (admin.username.equals(username) && admin.password.equals(password)) {
+                System.out.println("Masukkan captcha berikut: " + captcha.getCaptcha());
+                String captchaInput = scanner.nextLine();
+    
+                if(captcha.verifikasi(captchaInput)){
+                    System.out.println("Login berhasil! \n");
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            scanner.close(); // Memastikan scanner ditutup dalam kondisi apapun
         }
-
     }
-
+    
 }

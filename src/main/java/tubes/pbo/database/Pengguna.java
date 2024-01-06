@@ -1,9 +1,9 @@
 package tubes.pbo.database;
 
-abstract class Pengguna {
+public abstract class Pengguna {
     private String nama;
-    private String username;
-    private String password;
+    public String username;
+    public String password;
 
     public Pengguna(String uname, String pw) {
         this.username = uname;
