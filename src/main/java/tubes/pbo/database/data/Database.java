@@ -17,13 +17,31 @@ public class Database {
             e.printStackTrace();
         }
     }
+
     public Produk getBarangByID(int id_barang) throws SQLException {
-        String query = "SELECT * FROM barang WHERE id_barang = ?;";
+        String query = "SELECT * FROM produk WHERE id_barang = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, id_barang);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Produk(rs.getInt("id_barang"), rs.getString("nama_barang"), rs.getDouble("harga"), rs.getInt("stok"));
+                    return new Produk(rs.getInt("id_barang"), rs.getString("nama_barang"), rs.getDouble("harga"),
+                            rs.getInt("stok"));
+                }
+            }
+        }
+        return null;
+    }
+
+    public Produk getProdukByNama(String nama) throws SQLException {
+        String query = "SELECT * FROM produk WHERE nama_barang = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, nama);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int id_barang = rs.getInt("id_barang");
+                    double harga = rs.getDouble("harga");
+                    int stok = rs.getInt("stok");
+                    return new Produk(id_barang, nama, harga, stok);
                 }
             }
         }
@@ -31,13 +49,32 @@ public class Database {
     }
 
     public void addProduk(Produk produk) throws SQLException {
-        String query = "INSERT INTO produk (id_barang,nama_barang, harga, stok) VALUES (?,?, ?, ?);";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setInt(1, produk.getId_barang());
-            pstmt.setString(2, produk.getNama_barang());
-            pstmt.setDouble(3, produk.getHarga());
-            pstmt.setInt(4, produk.getStok());
-            pstmt.executeUpdate();
+        // Cek apakah ada produk dengan nama yang sama
+        String checkQuery = "SELECT id_barang, stok FROM produk WHERE nama_barang = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, produk.getNama_barang());
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                if (rs.next()) {
+                    // Produk dengan nama yang sama ditemukan, lakukan update
+                    int existingId = rs.getInt("id_barang");
+                    int existingStok = rs.getInt("stok");
+                    String updateQuery = "UPDATE produk SET  stok = ? WHERE id_barang = ?";
+                    try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+                        updateStmt.setInt(1, existingStok + produk.getStok());
+                        updateStmt.setInt(2, existingId);
+                        updateStmt.executeUpdate();
+                    }
+                } else {
+                    // Tidak ada produk dengan nama yang sama, lakukan insert
+                    String insertQuery = "INSERT INTO produk (nama_barang, harga, stok) VALUES (?, ?, ?)";
+                    try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
+                        insertStmt.setString(1, produk.getNama_barang());
+                        insertStmt.setDouble(2, produk.getHarga());
+                        insertStmt.setInt(3, produk.getStok());
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
         }
     }
 
@@ -45,28 +82,42 @@ public class Database {
         String query = "DELETE FROM produk WHERE id_barang = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, id_barang);
-            pstmt.executeUpdate();
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                System.out.println("Tidak ada baris yang terpengaruh, mungkin produk dengan ID tersebut tidak ada.");
+            }
         }
     }
 
+    // public void updateBarang(Produk produk) throws SQLException {
+    // String query = "UPDATE produk SET nama_barang = ?, harga = ?, stok = ? WHERE
+    // id_barang = ?;";
+    // try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+    // pstmt.setString(1, produk.getNama_barang());
+    // pstmt.setDouble(2, produk.getHarga());
+    // pstmt.setInt(3, produk.getStok());
+    // pstmt.setInt(4, produk.getId_barang());
+    // pstmt.executeUpdate();
+    // }
+    // }
     public void updateBarang(Produk produk) throws SQLException {
-        String query = "UPDATE produk SET nama_barang = ?, harga = ?, stok = ? WHERE id_barang = ?;";
+        String query = "UPDATE produk SET harga = ?, stok = ? WHERE id_barang = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, produk.getNama_barang());
-            pstmt.setDouble(2, produk.getHarga());
-            pstmt.setInt(3, produk.getStok());
-            pstmt.setInt(4, produk.getId_barang());
+            pstmt.setDouble(1, produk.getHarga());
+            pstmt.setInt(2, produk.getStok());
+            pstmt.setInt(3, produk.getId_barang());
             pstmt.executeUpdate();
         }
     }
 
-        public List<Produk> getAllBarang() throws SQLException {
+    public List<Produk> getAllBarang() throws SQLException {
         List<Produk> produkList = new ArrayList<>();
         String query = "SELECT * FROM produk;";
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+                ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                produkList.add(new Produk(rs.getInt("id_barang"), rs.getString("nama_barang"), rs.getDouble("harga"), rs.getInt("stok")));
+                produkList.add(new Produk(rs.getInt("id_barang"), rs.getString("nama_barang"), rs.getDouble("harga"),
+                        rs.getInt("stok")));
             }
         }
         return produkList;

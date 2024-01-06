@@ -7,11 +7,11 @@ public class Produk {
     private double harga;
     private Integer stok;
 
-    public Produk(int id ,String nama , double harga, int stok){
-        this.nama_barang = nama;
+    public Produk(int id_barang, String nama_barang, double harga, int stok) {
+        this.id_barang = id_barang;
+        this.nama_barang = nama_barang;
         this.harga = harga;
         this.stok = stok;
-        this.id_barang= id;
     }
 
     public double getHarga() {
