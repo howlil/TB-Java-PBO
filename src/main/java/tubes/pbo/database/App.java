@@ -15,8 +15,10 @@ import java.util.List;
 public class App {
     public static void main(String[] args) {
         Admin admin = new Admin("admin", "admin");
-
+        // Pelanggan pelanggan = new Pelanggan("aul", "123");
+        Transaksi transaki = new Transaksi();
         Sistem sistem = new Sistem(admin);
+        // Sistem sistem1 = new Sistem(pelanggan);
         Scanner scanner = new Scanner(System.in);
         Date date = new Date();
         SimpleDateFormat waktu = new SimpleDateFormat("HH:mm:ss z");
@@ -31,10 +33,10 @@ public class App {
         int option = 0;
         try {
             do {
-                System.out.println("\nMenu Admin");
+                System.out.println("\n=================Menu Admin==================");
                 System.out.println("1. Kelola Stok Produk");
                 System.out.println("2. Transaksi");
-                System.out.println("3. Keuntungan");
+                System.out.println("3. Keuntungan dan Riwayat");
                 System.out.println("4. Keluar");
                 System.out.print("Pilih opsi: ");
 
@@ -46,7 +48,7 @@ public class App {
                         Clean.clearScreen();
                         int opsiSubmenu = 0;
                         do {
-                            System.out.println("\nKelola Stok Produk:");
+                            System.out.println("\n=========Kelola Stok Produk===========");
                             System.out.println("1. Tambah Barang");
                             System.out.println("2. Lihat Semua Barang");
                             System.out.println("3. Update Barang");
@@ -86,13 +88,80 @@ public class App {
                         } while (opsiSubmenu != 5);
                         break;
                     case 2:
+                        Clean.clearScreen();    
+                        int opsiTransaksi = 0;
+                        do {
+                            System.out.println("\n==============TRANSAKI===============:");
+                            System.out.println("1. Lihat Semua Barang");
+                            System.out.println("2. Buat Transaksi");
+                            System.out.println("3. Cetak Struk Barang");
+                            System.out.println("4. Kembali ke Menu Utama");
+                            System.out.print("Pilih opsi: ");
+                            opsiTransaksi = scanner.nextInt();
+                            scanner.nextLine();
 
-                        ;
+                            switch (opsiTransaksi) {
+                                case 1:
+                                    Clean.clearScreen();
+                                    admin.showProduk();
+                                    break;
+                            
+                                case 2:
+                                    transaki.buatTransaksi();
+                                    transaki.pembayaran();
+                                    transaki.selesaikanTransaksi("Informasi pembayaran");
+                                    break;
+                            
+                                case 3:
+                                    Clean.clearScreen();
+                                    break;
+                            
+                                case 4:
+                                    Clean.clearScreen();
+                                    System.out.println("Kembali ke Menu Utama");    
+                                                                    break;
+                            
+                                default:
+                                    break;
+                            }
+                        } while (opsiTransaksi!=4);
                         break;
                     case 3:
-                        System.out.println("Keluar.");
+                        Clean.clearScreen();   
+                         
+                        int opsiKeuntungan = 0;
+                        do {
+                            System.out.println("\n==============Keuntungan dan Riwayat===============:");
+                            System.out.println("1. Riwayat Transaksi");
+                            System.out.println("2. Keuntungan");
+                            System.out.println("3. Cari Pelanggan");
+                            System.out.println("4. Kembali ke Halaman Menu");
+                            System.out.print("Pilih opsi: ");
+                            opsiKeuntungan = scanner.nextInt();
+                            scanner.nextLine();
+
+                            switch (opsiKeuntungan) {
+                                case 1:
+                                    
+                                    break;
+                            
+                                case 2:
+                                    
+                                    break;
+                            
+                                case 3:
+                                    break;
+                                case 4:
+                                    System.out.println("Kembali ke Menu Utama"); 
+                                    break;
+                            
+                                default:
+                                    break;
+                            }
+                        } while (opsiKeuntungan!=4);
                         break;
                     case 4:
+                        Clean.clearScreen();    
                         System.out.println("Keluar.");
                         break;
                     default:

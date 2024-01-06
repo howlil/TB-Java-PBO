@@ -3,8 +3,11 @@ import tubes.pbo.database.Transaksi;
 
 public interface TransaksiManajemen {
     Transaksi buatTransaksi();
-    void showTransaksi(String transactionId);
-    void pembayaran(Transaksi transaction);
+    void catakStruk();
+    void pembayaran();
+    void riwayatTransaksi();
+    void keuntungan();
+
 
     
 }

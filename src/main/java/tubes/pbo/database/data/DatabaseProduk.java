@@ -7,10 +7,10 @@ import java.util.List;
 
 import tubes.pbo.database.Produk;
 
-public class Database {
+public class DatabaseProduk {
     private Connection connection;
 
-    public Database() {
+    public DatabaseProduk() {
         try {
             this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kopimas", "root", "");
         } catch (SQLException e) {
@@ -89,17 +89,7 @@ public class Database {
         }
     }
 
-    // public void updateBarang(Produk produk) throws SQLException {
-    // String query = "UPDATE produk SET nama_barang = ?, harga = ?, stok = ? WHERE
-    // id_barang = ?;";
-    // try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-    // pstmt.setString(1, produk.getNama_barang());
-    // pstmt.setDouble(2, produk.getHarga());
-    // pstmt.setInt(3, produk.getStok());
-    // pstmt.setInt(4, produk.getId_barang());
-    // pstmt.executeUpdate();
-    // }
-    // }
+   
     public void updateBarang(Produk produk) throws SQLException {
         String query = "UPDATE produk SET harga = ?, stok = ? WHERE id_barang = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -111,7 +101,7 @@ public class Database {
     }
 
     public List<Produk> getAllBarang() throws SQLException {
-        List<Produk> produkList = new ArrayList<>();
+        List<Produk> produkList = new LinkedList<>();
         String query = "SELECT * FROM produk;";
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(query)) {

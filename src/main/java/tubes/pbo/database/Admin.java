@@ -10,7 +10,7 @@ import tubes.pbo.database.template.InventoriManajemen;;
 
 public class Admin extends Pengguna implements InventoriManajemen {
     private static Scanner scanner = new Scanner(System.in);
-    private static final Database dbHelper = new Database();
+    private static final DatabaseProduk dbHelper = new DatabaseProduk();
     private int a = 1;
 
     public Admin(String username, String password) {
