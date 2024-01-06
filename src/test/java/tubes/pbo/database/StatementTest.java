@@ -2,6 +2,9 @@ package tubes.pbo.database;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import tubes.pbo.database.data.ConnectionUtil;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.*;

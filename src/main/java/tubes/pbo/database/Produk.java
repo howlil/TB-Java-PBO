@@ -4,17 +4,17 @@ public class Produk {
     
     private Integer id_barang;
     private String nama_barang;
-    private Integer harga;
+    private double harga;
     private Integer stok;
 
-    public Produk (int id ,String nama , int harga, int stok){
+    public Produk(int id ,String nama , double harga, int stok){
         this.nama_barang = nama;
         this.harga = harga;
         this.stok = stok;
-        this.id_barang = id;
+        this.id_barang= id;
     }
 
-    public Integer getHarga() {
+    public double getHarga() {
         return harga;
     }
     public void setHarga(Integer harga) {

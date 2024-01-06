@@ -3,6 +3,7 @@ package tubes.pbo.database;
 import java.util.Scanner;
 
 import tubes.pbo.database.login.Sistem;
+import tubes.pbo.database.template.Clean;
 
 import java.lang.invoke.VarHandle.AccessMode;
 import java.sql.SQLException;
@@ -11,12 +12,12 @@ import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
 
-
-public class App 
-{
+public class App {
     public static void main( String[] args )
     {
         Admin admin = new Admin("admin", "admin");
+        
+
         Sistem sistem = new Sistem(admin);
         Scanner scanner = new Scanner(System.in);
         Date date = new Date();
@@ -44,6 +45,7 @@ public class App
 
                 switch (option) {
                     case 1:
+                    Clean.clearScreen();
                     int opsiSubmenu=0;
                         do {
                             System.out.println("\nKelola Stok Produk:");
@@ -58,8 +60,9 @@ public class App
 
                             switch (opsiSubmenu) {
                                 case 1:
-                                // Implementasi untuk Tambah Barang
-                                break;
+                                Clean.clearScreen();
+                                admin.addProduk();
+                               break;
                             case 2:
                                 // Implementasi untuk Lihat Semua Barang
                                 break;
@@ -104,5 +107,5 @@ public class App
         
  
     }
-   
+
 }

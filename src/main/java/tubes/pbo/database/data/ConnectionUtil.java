@@ -1,4 +1,4 @@
-package tubes.pbo.database;
+package tubes.pbo.database.data;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

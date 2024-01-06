@@ -1,6 +1,9 @@
 package tubes.pbo.database;
 
 import com.zaxxer.hikari.*;
+
+import tubes.pbo.database.data.ConnectionUtil;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
