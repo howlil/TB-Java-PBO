@@ -39,39 +39,54 @@ public class App
                 System.out.println("4. Keluar");
                 System.out.print("Pilih opsi: ");
 
-                if (!scanner.hasNextInt()) {
-                    System.out.println("Masukan bukan angka. Silakan coba lagi.");
-                    scanner.next(); // Bersihkan input yang salah
-                    continue;
-                }
-
                 option = scanner.nextInt();
-                scanner.nextLine(); // Bersihkan newline setelah angka
+                scanner.nextLine(); 
 
                 switch (option) {
                     case 1:
-                        int opsi;
+                    int opsiSubmenu=0;
                         do {
                             System.out.println("\nKelola Stok Produk:");
                             System.out.println("1. Tambah Barang");
                             System.out.println("2. Lihat Semua Barang");
                             System.out.println("3. Update Barang");
                             System.out.println("4. Hapus Barang");
+                            System.out.println("5. Kembali ke Menu Utama");
                             System.out.print("Pilih opsi: ");
+                            opsiSubmenu = scanner.nextInt();
+                            scanner.nextLine(); 
 
-                            while (!scanner.hasNextInt()) {
-                                System.out.println("Masukan bukan angka. Silakan coba lagi.");
-                                scanner.next(); // Bersihkan input yang salah
+                            switch (opsiSubmenu) {
+                                case 1:
+                                // Implementasi untuk Tambah Barang
+                                break;
+                            case 2:
+                                // Implementasi untuk Lihat Semua Barang
+                                break;
+                            case 3:
+                                // Implementasi untuk Update Barang
+                                break;
+                            case 4:
+                                // Implementasi untuk Hapus Barang
+                                break;
+                            case 5:
+                                System.out.println("Kembali ke Menu Utama.");
+                                break;
+                            default:
+                                System.out.println("Opsi tidak dikenal.");
+                                break;
                             }
-
-                            opsi = scanner.nextInt();
-                            scanner.nextLine(); // Bersihkan newline setelah angka
-
-                            // Implementasi logika untuk setiap opsi
-
-                        } while (opsi != 4);
+                       
+                         
+                        } while (opsiSubmenu != 5);
                         break;
-                    // Implementasi untuk opsi lain
+                    case 2:
+                       
+                    ;
+                        break;
+                    case 3:
+                        System.out.println("Keluar.");
+                        break;
                     case 4:
                         System.out.println("Keluar.");
                         break;
