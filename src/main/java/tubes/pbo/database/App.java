@@ -2,9 +2,9 @@ package tubes.pbo.database;
 
 import java.util.Scanner;
 
-import tubes.pbo.database.login.Sistem;
-import tubes.pbo.database.template.Clean;
-
+import tubes.pbo.database.login.*;
+import tubes.pbo.database.template.*;
+import java.util.*;
 import java.lang.invoke.VarHandle.AccessMode;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -13,21 +13,19 @@ import java.util.InputMismatchException;
 import java.util.List;
 
 public class App {
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
         Admin admin = new Admin("admin", "admin");
-        
 
         Sistem sistem = new Sistem(admin);
         Scanner scanner = new Scanner(System.in);
         Date date = new Date();
         SimpleDateFormat waktu = new SimpleDateFormat("HH:mm:ss z");
-        SimpleDateFormat tanggal = new SimpleDateFormat("E, dd/MM/yyyy"); 
-       
+        SimpleDateFormat tanggal = new SimpleDateFormat("E, dd/MM/yyyy");
+
         // if (!sistem.login()) {
-        //     System.out.println("Login gagal");
-        //     scanner.close();
-        //     return;
+        // System.out.println("Login gagal");
+        // scanner.close();
+        // return;
         // }
 
         int option = 0;
@@ -41,12 +39,12 @@ public class App {
                 System.out.print("Pilih opsi: ");
 
                 option = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine();
 
                 switch (option) {
                     case 1:
-                    Clean.clearScreen();
-                    int opsiSubmenu=0;
+                        Clean.clearScreen();
+                        int opsiSubmenu = 0;
                         do {
                             System.out.println("\nKelola Stok Produk:");
                             System.out.println("1. Tambah Barang");
@@ -56,36 +54,40 @@ public class App {
                             System.out.println("5. Kembali ke Menu Utama");
                             System.out.print("Pilih opsi: ");
                             opsiSubmenu = scanner.nextInt();
-                            scanner.nextLine(); 
+                            scanner.nextLine();
 
                             switch (opsiSubmenu) {
                                 case 1:
-                                Clean.clearScreen();
-                                admin.addProduk();
-                               break;
-                            case 2:
-                                // Implementasi untuk Lihat Semua Barang
-                                break;
-                            case 3:
-                                // Implementasi untuk Update Barang
-                                break;
-                            case 4:
-                                // Implementasi untuk Hapus Barang
-                                break;
-                            case 5:
-                                System.out.println("Kembali ke Menu Utama.");
-                                break;
-                            default:
-                                System.out.println("Opsi tidak dikenal.");
-                                break;
+                                    Clean.clearScreen();
+                                    admin.addProduk();
+                                    break;
+                                case 2:
+                                    Clean.clearScreen();
+                                    admin.showProduk();
+                                    break;
+                                case 3:
+                                    Clean.clearScreen();
+                                    admin.updateProduk();
+                                    break;
+                                case 4:
+                                    Clean.clearScreen();
+                                    admin.deleteProduk();
+                                    break;
+                                case 5:
+                                    Clean.clearScreen();
+                                    System.out.println("Kembali ke Menu Utama.");
+                                    break;
+                                default:
+                                    Clean.clearScreen();
+                                    System.out.println("Opsi tidak dikenal.");
+                                    break;
                             }
-                       
-                         
+
                         } while (opsiSubmenu != 5);
                         break;
                     case 2:
-                       
-                    ;
+
+                        ;
                         break;
                     case 3:
                         System.out.println("Keluar.");
@@ -104,8 +106,7 @@ public class App {
         } finally {
             scanner.close();
         }
-        
- 
+
     }
 
 }
