@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import tubes.pbo.database.Produk;
+
 public class DatabaseTransaksi {
 
     private Connection connection;
@@ -17,75 +19,111 @@ public class DatabaseTransaksi {
             e.printStackTrace();
         }
     }
-     public void tambahTransaksi(String idPesan, double totalHarga, int totalBeli, Map<String, Integer> item, String namaPelanggan, String informasiPembayaran) throws SQLException {
-        // Start a transaction
-        connection.setAutoCommit(false);
 
-        try {
-            // Tambahkan ke tabel transaksi
-            String queryTransaksi = "INSERT INTO transaksi (id_pesan, totalHarga, totalBeli) VALUES (?, ?, ?)";
-            try (PreparedStatement pst = connection.prepareStatement(queryTransaksi)) {
-                pst.setString(1, idPesan);
-                pst.setDouble(2, totalHarga);
-                pst.setInt(3, totalBeli);
-                pst.executeUpdate();
-            }
-
-            // Tambahkan ke tabel transaksi_produk dan update stok di tabel produk
-            String queryTransaksiProduk = "INSERT INTO transaksi_produk (id_barang, id_pesan) VALUES (?, ?)";
-            String queryUpdateStok = "UPDATE produk SET stok = stok - ? WHERE nama_barang = ?";
-            for (Map.Entry<String, Integer> entry : item.entrySet()) {
-                String namaBarang = entry.getKey();
-                int jumlah = entry.getValue();
-
-                // Update stok
-                try (PreparedStatement pst = connection.prepareStatement(queryUpdateStok)) {
-                    pst.setInt(1, jumlah);
-                    pst.setString(2, namaBarang);
-                    pst.executeUpdate();
-                }
-
-                // Dapatkan id_barang berdasarkan nama_barang
-                String idBarang = getIdBarangFromNama(namaBarang);
-
-                // Tambahkan ke transaksi_produk
-                try (PreparedStatement pst = connection.prepareStatement(queryTransaksiProduk)) {
-                    pst.setString(1, idBarang);
-                    pst.setString(2, idPesan);
-                    pst.executeUpdate();
-                }
-            }
-
-            // Tambahkan ke tabel riwayat transaksi
-            String queryRiwayat = "INSERT INTO riwayat_transaksi (id_pesan, namaPembeli, tanggal, informasi_pembayaran) VALUES (?, ?, NOW(), ?)";
-            try (PreparedStatement pst = connection.prepareStatement(queryRiwayat)) {
-                pst.setString(1, idPesan);
-                pst.setString(2, namaPelanggan);
-                pst.setString(3, informasiPembayaran);
-                pst.executeUpdate();
-            }
-
-            // Commit transaction
-            connection.commit();
-        } catch (SQLException e) {
-            // Jika terjadi error, rollback transaction
-            connection.rollback();
-            throw e;
-        } finally {
-            // Set auto-commit kembali ke true
-            connection.setAutoCommit(true);
+    public void updateBarangStok(int barangId, int stokBaru) throws SQLException {
+        String query = "UPDATE produk SET stok = ? WHERE id_barang = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, stokBaru);
+            pstmt.setInt(2, barangId);
+            pstmt.executeUpdate();
         }
     }
-    private String getIdBarangFromNama(String namaBarang) throws SQLException {
-        String query = "SELECT id_barang FROM produk WHERE nama_barang = ?";
-        try (PreparedStatement pst = connection.prepareStatement(query)) {
-            pst.setString(1, namaBarang);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                return rs.getString("id_barang");
+
+    // Mendapatkan barang berdasarkan ID
+    public Produk getBarangByID(int id) throws SQLException {
+        String query = "SELECT * FROM produk WHERE id_barang = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Produk(rs.getInt("id_barang"), rs.getString("nama_barang"), rs.getDouble("harga"),
+                            rs.getInt("stok"));
+                }
             }
         }
         return null;
+    }
+    public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String namaProduk, int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
+        String informasiPembayaran = String.format("Produk: %s, Jumlah: %d, Total Harga: %.2f", namaProduk, totalBeli, totalHarga);
+        String query = "INSERT INTO riwayat_transaksi (id_pesan, namaPembeli, tanggal, informasi_pembayaran) VALUES (?, ?, ?, ?);";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, idPesan);
+            pstmt.setString(2, namaPembeli);
+            pstmt.setDate(3, tanggal);
+            pstmt.setString(4, informasiPembayaran);
+            pstmt.executeUpdate();
+        }
+    }
+    public void tampilkanSemuaRiwayatTransaksi() throws SQLException {
+        String query = "SELECT * FROM riwayat_transaksi;";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                System.out.println("ID Riwayat: " + rs.getString("id_riwayat") +
+                                   ", ID Pesan: " + rs.getString("id_pesan") +
+                                   ", Nama Pembeli: " + rs.getString("namaPembeli") +
+                                   ", Tanggal: " + rs.getDate("tanggal") +
+                                   ", Info Pembayaran: " + rs.getString("informasi_pembayaran"));
+            }
+        }
+    }
+
+    
+    public void simpanTransaksiProduk(int idBarang, String idPesan) throws SQLException {
+        String query = "INSERT INTO transaksi_produk (id_barang, id_pesan) VALUES (?, ?);";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, idBarang);
+            pstmt.setString(2, idPesan);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public String simpanTransaksi(double totalHarga, int jumlahBeli) throws SQLException {
+        String query = "INSERT INTO transaksi (totalHarga, totalBeli) VALUES (?, ?);";
+        try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setDouble(1, totalHarga);
+            pstmt.setInt(2, jumlahBeli);
+            pstmt.executeUpdate();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getString(1); // Mengembalikan id_pesan
+                } else {
+                    throw new SQLException("Gagal membuat transaksi, ID tidak diperoleh.");
+                }
+            }
+        }
+    }
+
+    public void buatTransaksi(int barangId, int jumlahBeli, String namaPembeli) throws SQLException {
+        connection.setAutoCommit(false);
+        Savepoint savepoint = connection.setSavepoint();
+
+        try {
+            Produk produk = getBarangByID(barangId);
+            if (produk == null) {
+                throw new SQLException("Barang tidak ditemukan");
+            }
+
+            if (produk.getStok() < jumlahBeli) {
+                throw new SQLException("Stok tidak cukup");
+            }
+
+            int stokBaru = produk.getStok() - jumlahBeli;
+            updateBarangStok(barangId, stokBaru);
+
+            double totalHarga = produk.getHarga() * jumlahBeli;
+            // Struk struk = new Struk(namaPembeli, barangId, totalHarga, jumlahBeli);
+            // addStruk(struk);
+
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback(savepoint);
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
     }
 
 }

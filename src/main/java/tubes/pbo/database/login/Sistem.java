@@ -6,10 +6,12 @@ import tubes.pbo.database.*;;
 
 public class Sistem {
     private Admin admin;
+    private Pelanggan user;
     private Captcha captcha;
 
-    public Sistem(Admin admin) {
+    public Sistem(Admin admin,Pelanggan user) {
         this.admin = admin;
+        this.user = user;
         this.captcha = new Captcha();
     }
 
@@ -22,7 +24,7 @@ public class Sistem {
             System.out.print("Password : ");
             String password = scanner.nextLine();
     
-            if (admin.username.equals(username) && admin.password.equals(password)) {
+            if (admin.username.equals(username) && admin.password.equals(password) || user.username.equals(username) && user.password.equals(password)) {
                 System.out.println("Masukkan captcha berikut: " + captcha.getCaptcha());
                 String captchaInput = scanner.nextLine();
     

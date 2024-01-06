@@ -2,9 +2,12 @@ package tubes.pbo.database;
 
 public class Pelanggan extends Pengguna {
     Integer saldo = 0;
+    private String nama;
+    private String noHp;
 
-    public Pelanggan(String username, String password) {
-        super(username, password);
+
+    public Pelanggan(String nama, String noHp) {
+        super(nama, noHp);
     }
 
     public Integer deposit(Integer totalDeposit) {
@@ -20,8 +23,16 @@ public class Pelanggan extends Pengguna {
         return getSaldo();
     }
 
-    public Integer diskon() {
-
-        return null;
+    public String getNama() {
+        return nama;
+    }
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+    public String getNoHp() {
+        return noHp;
+    }
+    public void setNoHp(String noHp) {
+        this.noHp = noHp;
     }
 }

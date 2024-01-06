@@ -95,8 +95,9 @@ public class Admin extends Pengguna implements InventoriManajemen {
             }
             System.out.println("Daftar Barang:");
             for (Produk produk : produkList) {
-                System.out.printf("ID: %d, Nama: %s, Harga: %.2f, Stok: %d\n", produk.getId_barang(),
-                        produk.getNama_barang(), produk.getHarga(), produk.getStok());
+                System.out.printf("ID: %d, Nama: %s, Harga: %.2f, Stok: %d\n", 
+                produk.getId_barang(), produk.getNama_barang(), produk.getHarga(), produk.getStok());
+            
             }
         } catch (SQLException e) {
             System.out.println("Gagal mengambil data barang: " + e.getMessage());

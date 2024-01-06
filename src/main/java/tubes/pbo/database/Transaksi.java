@@ -1,102 +1,103 @@
 package tubes.pbo.database;
 
+import tubes.pbo.database.data.DatabaseProduk;
 import tubes.pbo.database.data.DatabaseTransaksi;
 import tubes.pbo.database.template.TransaksiManajemen;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.UUID;
+import java.util.Date;
 
 public class Transaksi implements TransaksiManajemen {
     private static Scanner scanner = new Scanner(System.in);
-
-    private String idTransaksi;
-    private String namaPelanggan;
-    private Map<String, Integer> item;
+    private static final DatabaseTransaksi dbTransaksi = new DatabaseTransaksi();
     private double totalHarga;
-    private DatabaseTransaksi dbTransaksi;
-
-    public Transaksi() {
-        this.dbTransaksi = new DatabaseTransaksi();
-    }
+    private Integer totalBeli;
+    private String namaPembeli;
+    private String noHp;
+    
 
     @Override
-    public void catakStruk() {
+    public void cetakStruk() {
+         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String tanggal = formatter.format(new Date());
+
+        System.out.println("======================================");
+        System.out.println("              Struk Belanja           ");
+        System.out.println("               KopiMas                ");
+        System.out.println("======================================");
+        System.out.println("Tanggal: " + tanggal);
+        System.out.println("Nama Pembeli: " + namaPembeli);
+        System.out.println("No HP: " + noHp);
+        System.out.println("Total Beli: " + totalBeli + " item(s)");
+        System.out.println("Total Harga: Rp" + String.format("%.2f", totalHarga));
+        System.out.println("======================================");
+        System.out.println("         Terima Kasih dan             ");
+        System.out.println("     Selamat Menikmati Kopi Anda      ");
+        System.out.println("======================================");
     }
-    public void selesaikanTransaksi(String informasiPembayaran) {
+    
+
+    @Override
+    public void buatTransaksi() {
+        System.out.print("Nama Pembeli: ");
+        this.namaPembeli = scanner.nextLine();
+        System.out.print("No HP: ");
+        this.noHp = scanner.nextLine();
+        System.out.print("ID Barang: ");
+        int barangID = scanner.nextInt();
+        
         try {
-            int totalBeli = 0;
-            for (Integer jumlah : item.values()) {
-                totalBeli += jumlah;
+            Produk produk = dbTransaksi.getBarangByID(barangID);
+            if (produk == null) {
+                System.out.println("Barang tidak ditemukan.");
+                return;
             }
-    
-            this.idTransaksi = UUID.randomUUID().toString(); // Generate unique ID
-            dbTransaksi.tambahTransaksi(idTransaksi, totalHarga, totalBeli, item, namaPelanggan, informasiPembayaran);
-            System.out.println("Transaksi berhasil disimpan");
-        } catch (SQLException e) {
-            System.out.println("Gagal menyimpan transaksi: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
-    public Transaksi buatTransaksi() {
-        System.out.print("Nama Pelanggan: ");
-        this.namaPelanggan = scanner.nextLine();
-
-        while (true) {
-            System.out.print("Nama Barang: ");
-            String namaBarang = scanner.nextLine();
-            System.out.print("Jumlah: ");
-            int jumlah = scanner.nextInt();
+            
+            System.out.print("Jumlah Beli: ");
+            this.totalBeli = scanner.nextInt();
             scanner.nextLine(); // Consume newline
-
-            // Tambahkan ke daftar item
-            item.put(namaBarang, item.getOrDefault(namaBarang, 0) + jumlah);
-
-            System.out.print("Tambah barang lagi? (y/n): ");
-            String response = scanner.nextLine();
-            if (!response.equalsIgnoreCase("y")) {
-                break;
+            if (produk.getStok() <  this.totalBeli) {
+                System.out.println("Stok tidak cukup.");
+                return;
             }
+
+            // Mengurangi stok
+            int stokBaru = produk.getStok() -  this.totalBeli;
+            dbTransaksi.updateBarangStok(barangID, stokBaru);
+
+            // Menghitung total harga
+            this.totalHarga = produk.getHarga() *  this.totalBeli;
+
+            // Menyimpan transaksi
+            String idPesan = dbTransaksi.simpanTransaksi(this.totalHarga,  this.totalBeli);
+            dbTransaksi.simpanTransaksiProduk(barangID, idPesan);
+            java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+            dbTransaksi.simpanRiwayatTransaksi(idPesan, namaPembeli, produk.getNama_barang(), this.totalBeli, totalHarga, sqlDate);
+    
+    
+            System.out.println("Transaksi berhasil disimpan.");
+        } catch (SQLException e) {
+            System.out.println("Gagal melakukan transaksi: " + e.getMessage());
         }
-        return this; // Mengembalikan objek transaksi ini
-    }
-
-    @Override
-    public void pembayaran() {
-        // Hitung total harga. Anda bisa menyesuaikannya untuk mengambil harga dari database.
-        this.totalHarga = hitungTotalHarga();
-        System.out.println("Total yang harus dibayar: " + totalHarga);
-        // Logika pembayaran lebih lanjut bisa ditambahkan di sini.
-    }
-
-    private double hitungTotalHarga() {
-        double total = 0.0;
-        for (Map.Entry<String, Integer> entry : item.entrySet()) {
-            String namaBarang = entry.getKey();
-            int jumlah = entry.getValue();
-
-            // Asumsikan harga tiap barang adalah 10.000 (misalnya)
-            // Anda bisa memodifikasi bagian ini untuk mengambil harga sebenarnya dari database
-            double harga = 10000.0; 
-
-            total += harga * jumlah;
-        }
-        return total;
     }
 
     @Override
     public void riwayatTransaksi() {
-        // TODO Auto-generated method stub
-
+        try {
+            dbTransaksi.tampilkanSemuaRiwayatTransaksi();
+        } catch (SQLException e) {
+            System.out.println("Gagal menampilkan riwayat transaksi: " + e.getMessage());
+        }
     }
 
     @Override
     public void keuntungan() {
-        // TODO Auto-generated method stub
 
     }
+
 }
