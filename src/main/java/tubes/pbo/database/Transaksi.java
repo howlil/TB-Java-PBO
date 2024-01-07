@@ -22,6 +22,7 @@ public class Transaksi implements TransaksiManajemen {
     private String noHp;
 
     
+    //cetak struk
     @Override
 public void cetakStruk() {
     try {
@@ -54,6 +55,7 @@ public void cetakStruk() {
     }
 }
 
+    //buat transaksi
 
     @Override
     public void buatTransaksi() {
@@ -98,6 +100,7 @@ public void cetakStruk() {
         }
     }
 
+    // riwayat transaksi
     @Override
     public void riwayatTransaksi() {
         try {
@@ -106,6 +109,8 @@ public void cetakStruk() {
             System.out.println("Gagal menampilkan riwayat transaksi: " + e.getMessage());
         }
     }
+
+    //menampilakntotal barang yang terjual
     private void tampilkanTotalBarangTerjual() {
         try {
             int totalTerjual = dbTransaksi.hitungTotalBarangTerjual();
@@ -114,6 +119,8 @@ public void cetakStruk() {
             System.out.println("Gagal menghitung total barang terjual: " + e.getMessage());
         }
     }
+
+    //menghituung dan menyimpan keuntungan
     public void hitungDanSimpanKeuntungan() {
         try {
             // Misalkan Anda memiliki metode untuk mendapatkan daftar barang terjual dengan jumlahnya
@@ -132,6 +139,8 @@ public void cetakStruk() {
             System.out.println("Gagal menghitung dan menyimpan keuntungan: " + e.getMessage());
         }
     }
+
+    //keuntungan
     @Override
     public void keuntungan() {
         try {

@@ -19,11 +19,11 @@ public class App {
         Transaksi transaki = new Transaksi();
         Sistem sistem = new Sistem(admin);
 
-        // if (!sistem.login()) {
-        // System.out.println("Login gagal");
-        // scanner.close();
-        // return;
-        // }
+        if (!sistem.login()) {
+        System.out.println("Login gagal");
+        scanner.close();
+        return;
+        }
 
         int option = 0;
         try {

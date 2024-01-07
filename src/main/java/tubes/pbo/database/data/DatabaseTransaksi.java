@@ -13,6 +13,7 @@ public class DatabaseTransaksi {
 
     private Connection connection;
 
+    //konstruktor
     public DatabaseTransaksi() {
         try {
             this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kopimas", "root", "");
@@ -21,6 +22,7 @@ public class DatabaseTransaksi {
         }
     }
 
+    //update stok barang
     public void updateBarangStok(int barangId, int stokBaru) throws SQLException {
         String query = "UPDATE produk SET stok = ? WHERE id_barang = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -45,6 +47,7 @@ public class DatabaseTransaksi {
         return null;
     }
 
+    //simpar riwayat transaksi
     public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String noHp, String namaProduk,
             int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
         String informasiPembayaran = String.format("Produk: %s, Jumlah: %d, Total Harga: %.2f", namaProduk, totalBeli,
@@ -61,6 +64,7 @@ public class DatabaseTransaksi {
         }
     }
 
+    //taampilkan semua riwayat
     public void tampilkanSemuaRiwayatTransaksi() throws SQLException {
         String query = "SELECT * FROM riwayat_transaksi;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -75,12 +79,14 @@ public class DatabaseTransaksi {
         }
     }
 
+    //mendapatkan data terakhir dari transaksi
     public ResultSet getTransaksiTerakhir() throws SQLException {
         String query = "SELECT t.id_pesan, t.totalHarga, t.totalBeli, rt.namaPembeli, rt.noHp, rt.tanggal, rt.informasi_pembayaran FROM transaksi t LEFT JOIN riwayat_transaksi rt ON t.id_pesan = rt.id_pesan ORDER BY t.id_pesan DESC LIMIT 1;";
         PreparedStatement pstmt = connection.prepareStatement(query);
         return pstmt.executeQuery();
     }
 
+    // menyimpan  transaksi_produk
     public void simpanTransaksiProduk(int idBarang, String idPesan) throws SQLException {
         String query = "INSERT INTO transaksi_produk (id_barang, id_pesan) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -90,6 +96,7 @@ public class DatabaseTransaksi {
         }
     }
 
+    //menyimpan transaksi
     public String simpanTransaksi(double totalHarga, int jumlahBeli) throws SQLException {
         String query = "INSERT INTO transaksi (totalHarga, totalBeli) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -107,6 +114,7 @@ public class DatabaseTransaksi {
         }
     }
 
+    //menghitung keuntungan
     public double hitungKeuntungan() throws SQLException {
         String query = "SELECT tp.id_barang, tp.id_pesan, p.harga, COUNT(tp.id_barang) as jumlah_terjual FROM transaksi_produk tp JOIN produk p ON tp.id_barang = p.id_barang GROUP BY tp.id_barang;";
         double totalKeuntungan = 0.0;
@@ -121,6 +129,9 @@ public class DatabaseTransaksi {
         }
         return totalKeuntungan;
     }
+
+
+    // mendapatan daftar barang yang terjual
     public Map<Integer, Integer> getDaftarBarangTerjual() throws SQLException {
         Map<Integer, Integer> barangTerjual = new HashMap<>();
         String query = "SELECT tp.id_barang, SUM(t.totalBeli) as jumlah_terjual FROM transaksi_produk tp JOIN transaksi t ON tp.id_pesan = t.id_pesan GROUP BY tp.id_barang;";
@@ -137,7 +148,7 @@ public class DatabaseTransaksi {
     }
     
 
-
+    //menghitung barang yang terjual
     public int hitungTotalBarangTerjual() throws SQLException {
         String query = "SELECT SUM(totalBeli) as total_terjual FROM transaksi;";
         int totalTerjual = 0;
@@ -151,6 +162,8 @@ public class DatabaseTransaksi {
         return totalTerjual;
     }
 
+
+    //menyimpan keuntungan
     public void simpanKeuntungan(int idBarang, double jumlahKeuntungan) throws SQLException {
         String query = "INSERT INTO keuntungan (id_barang, jumlah_keuntungan, tanggal) VALUES (?, ?, ?);";
         java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
@@ -163,6 +176,8 @@ public class DatabaseTransaksi {
         }
     }
 
+
+    //memmabuat transaksi
     public void buatTransaksi(int barangId, int jumlahBeli, String namaPembeli) throws SQLException {
         connection.setAutoCommit(false);
         Savepoint savepoint = connection.setSavepoint();

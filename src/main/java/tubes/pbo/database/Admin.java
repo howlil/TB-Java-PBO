@@ -13,24 +13,26 @@ public class Admin extends Pengguna implements InventoriManajemen {
     private static final DatabaseProduk dbHelper = new DatabaseProduk();
     private int a = 1;
 
+    //konstruktor admin
     public Admin(String username, String password) {
         super(username, password);
     };
 
+    //menambahkan produk
     @Override
 
-        public void addProduk() {
+    public void addProduk() {
         System.out.println("Masukkan detail barang:");
         System.out.print("Nama Barang: ");
         String nama = scanner.nextLine();
 
         try {
-        Produk existingProduk = dbHelper.getProdukByNama(nama);
-        double harga = 0;
-        if (existingProduk == null) {
-        System.out.print("Harga Barang: ");
-        harga = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+             Produk existingProduk = dbHelper.getProdukByNama(nama);
+            double harga = 0;
+         if (existingProduk == null) {
+            System.out.print("Harga Barang: ");
+             harga = scanner.nextDouble();
+            scanner.nextLine(); // Consume newline
         }
 
         System.out.print("Stok Barang: ");
@@ -38,22 +40,22 @@ public class Admin extends Pengguna implements InventoriManajemen {
         scanner.nextLine(); // Consume newline
 
         if (existingProduk != null) {
-        existingProduk.setStok(existingProduk.getStok() + stok);
-        dbHelper.updateBarang(existingProduk);
+            existingProduk.setStok(existingProduk.getStok() + stok);
+            dbHelper.updateBarang(existingProduk);
         } else {
 
-        Produk produk = new Produk(a, nama, harga, stok); // Anggap ID adalah
-        dbHelper.addProduk(produk);
-        a++;
+            Produk produk = new Produk(a, nama, harga, stok); 
+            dbHelper.addProduk(produk);
+            a++;
         }
-
-        System.out.println("Operasi berhasil.");
+             System.out.println("Operasi berhasil.");
         } catch (SQLException e) {
-        System.out.println("Gagal melakukan operasi database: " + e.getMessage());
-        // e.printStackTrace(); // Untuk debugging lebih detail
+            System.out.println("Gagal melakukan operasi database: " + e.getMessage());
+            e.printStackTrace(); // Untuk debugging lebih detail
         }
         }
 
+    //menghapus produk
     @Override
     public void deleteProduk() {
         System.out.print("Masukkan ID produk yang akan dihapus: ");
@@ -85,6 +87,7 @@ public class Admin extends Pengguna implements InventoriManajemen {
         }
     }
 
+    // menampilakn semua produk
     @Override
     public void showProduk() {
         try {
@@ -105,18 +108,19 @@ public class Admin extends Pengguna implements InventoriManajemen {
 
     }
 
+    // update produk
     @Override
     public void updateProduk() {
         System.out.print("Masukkan ID barang yang akan diperbarui: ");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
         System.out.print("Nama Barang baru: ");
         String nama = scanner.nextLine();
         System.out.print("Harga Barang baru: ");
         double harga = scanner.nextDouble();
         System.out.print("Stok Barang baru: ");
         int stok = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         Produk produk = new Produk(id, nama, harga, stok);
         try {

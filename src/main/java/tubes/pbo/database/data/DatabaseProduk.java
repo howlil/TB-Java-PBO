@@ -10,6 +10,7 @@ import tubes.pbo.database.Produk;
 public class DatabaseProduk {
     private Connection connection;
 
+    //konstruktor
     public DatabaseProduk() {
         try {
             this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kopimas", "root", "");
@@ -18,6 +19,8 @@ public class DatabaseProduk {
         }
     }
 
+
+    //mendapatkan barang dari ID
     public Produk getBarangByID(int id_barang) throws SQLException {
         String query = "SELECT * FROM produk WHERE id_barang = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -32,6 +35,7 @@ public class DatabaseProduk {
         return null;
     }
 
+    //mendapatkan barang dari nama
     public Produk getProdukByNama(String nama) throws SQLException {
         String query = "SELECT * FROM produk WHERE nama_barang = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -48,6 +52,7 @@ public class DatabaseProduk {
         return null;
     }
 
+    // menambahkan produk
     public void addProduk(Produk produk) throws SQLException {
         // Cek apakah ada produk dengan nama yang sama
         String checkQuery = "SELECT id_barang, stok FROM produk WHERE nama_barang = ?";
@@ -78,6 +83,7 @@ public class DatabaseProduk {
         }
     }
 
+    //menaghpus produk
     public void deleteBarang(int id_barang) throws SQLException {
         String query = "DELETE FROM produk WHERE id_barang = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -89,7 +95,7 @@ public class DatabaseProduk {
         }
     }
 
-   
+   // mengaupdate produk
     public void updateBarang(Produk produk) throws SQLException {
         String query = "UPDATE produk SET harga = ?, stok = ? WHERE id_barang = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -99,6 +105,8 @@ public class DatabaseProduk {
             pstmt.executeUpdate();
         }
     }
+
+    //mendapatkan data semua produk
 
     public List<Produk> getAllBarang() throws SQLException {
         List<Produk> produkList = new LinkedList<>();
