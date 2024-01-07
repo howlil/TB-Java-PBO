@@ -43,18 +43,21 @@ public class DatabaseTransaksi {
         }
         return null;
     }
-    public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String namaProduk, int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
+    public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String noHp, String namaProduk, int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
         String informasiPembayaran = String.format("Produk: %s, Jumlah: %d, Total Harga: %.2f", namaProduk, totalBeli, totalHarga);
-        String query = "INSERT INTO riwayat_transaksi (id_pesan, namaPembeli, tanggal, informasi_pembayaran) VALUES (?, ?, ?, ?);";
-
+        String query = "INSERT INTO riwayat_transaksi (id_pesan, namaPembeli, noHp, tanggal, informasi_pembayaran) VALUES (?, ?, ?, ?, ?);";
+    
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, idPesan);
             pstmt.setString(2, namaPembeli);
-            pstmt.setDate(3, tanggal);
-            pstmt.setString(4, informasiPembayaran);
+            pstmt.setString(3, noHp);
+            pstmt.setDate(4, tanggal);
+            pstmt.setString(5, informasiPembayaran);
             pstmt.executeUpdate();
         }
     }
+  
+
     public void tampilkanSemuaRiwayatTransaksi() throws SQLException {
         String query = "SELECT * FROM riwayat_transaksi;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -69,6 +72,12 @@ public class DatabaseTransaksi {
         }
     }
 
+    public ResultSet getTransaksiTerakhir() throws SQLException {
+        String query = "SELECT t.id_pesan, t.totalHarga, t.totalBeli, rt.namaPembeli, rt.noHp, rt.tanggal, rt.informasi_pembayaran FROM transaksi t LEFT JOIN riwayat_transaksi rt ON t.id_pesan = rt.id_pesan ORDER BY t.id_pesan DESC LIMIT 1;";
+        PreparedStatement pstmt = connection.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+    
     
     public void simpanTransaksiProduk(int idBarang, String idPesan) throws SQLException {
         String query = "INSERT INTO transaksi_produk (id_barang, id_pesan) VALUES (?, ?);";
@@ -114,8 +123,7 @@ public class DatabaseTransaksi {
             updateBarangStok(barangId, stokBaru);
 
             double totalHarga = produk.getHarga() * jumlahBeli;
-            // Struk struk = new Struk(namaPembeli, barangId, totalHarga, jumlahBeli);
-            // addStruk(struk);
+
 
             connection.commit();
         } catch (SQLException e) {

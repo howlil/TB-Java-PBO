@@ -15,17 +15,9 @@ import java.util.List;
 public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("masukan nama anda");
-        String username = scanner.nextLine();
-
-        System.out.println("masukan password anda");
-        String password = scanner.nextLine();
-
         Admin admin = new Admin("admin", "admin");
-        Pelanggan user = new Pelanggan(username, password);
-
         Transaksi transaki = new Transaksi();
-        Sistem sistem = new Sistem(admin, user);
+        Sistem sistem = new Sistem(admin);
 
         // if (!sistem.login()) {
         // System.out.println("Login gagal");
@@ -36,7 +28,7 @@ public class App {
         int option = 0;
         try {
             do {
-                System.out.println("+++++++++KOPIMAS INTERNATION CORP++++++++++");
+                System.out.println("\n++++++++++ KOPIMAS INTERNATION CORP ++++++++++");
                 System.out.println("=================Menu Admin==================");
                 System.out.println("1. Kelola Stok Produk");
                 System.out.println("2. Transaksi");
@@ -53,7 +45,7 @@ public class App {
                         Clean.clearScreen();
                         int opsiSubmenu = 0;
                         do {
-                            System.out.println("+++++++++KOPIMAS INTERNATION CORP++++++++++");
+                            System.out.println("\n++++++++++ KOPIMAS INTERNATION CORP ++++++++++");
                             System.out.println("=========Kelola Stok Produk===========");
                             System.out.println("1. Tambah Barang");
                             System.out.println("2. Lihat Semua Barang");
@@ -99,7 +91,7 @@ public class App {
                         Clean.clearScreen();
                         int opsiTransaksi = 0;
                         do {
-                            System.out.println("+++++++++KOPIMAS INTERNATION CORP++++++++++");
+                            System.out.println("\n++++++++++ KOPIMAS INTERNATION CORP ++++++++++");
                             System.out.println("==============TRANSAKI===============:");
                             System.out.println("1. Lihat Semua Barang");
                             System.out.println("2. Buat Transaksi");
@@ -122,6 +114,7 @@ public class App {
 
                                 case 3:
                                     Clean.clearScreen();
+                                    transaki.cetakStruk();
                                     break;
 
                                 case 4:
@@ -140,12 +133,11 @@ public class App {
 
                         int opsiKeuntungan = 0;
                         do {
-                            System.out.println("+++++++++KOPIMAS INTERNATION CORP++++++++++");
+                            System.out.println("\n++++++++++ KOPIMAS INTERNATION CORP ++++++++++");
                             System.out.println("=============Keuntungan dan Riwayat===============:");
                             System.out.println("1. Riwayat Transaksi");
                             System.out.println("2. Keuntungan");
-                            System.out.println("3. Cari Pelanggan");
-                            System.out.println("4. Kembali ke Halaman Menu");
+                            System.out.println("3. Kembali ke Halaman Menu");
                             System.out.println("===================================");
                             System.out.print("Pilih opsi: ");
                             opsiKeuntungan = scanner.nextInt();
@@ -153,23 +145,20 @@ public class App {
 
                             switch (opsiKeuntungan) {
                                 case 1:
-
+                                    transaki.riwayatTransaksi();
                                     break;
 
                                 case 2:
-
+                                    transaki.keuntungan();
                                     break;
-
                                 case 3:
-                                    break;
-                                case 4:
                                     System.out.println("Kembali ke Menu Utama");
                                     break;
 
                                 default:
                                     break;
                             }
-                        } while (opsiKeuntungan != 4);
+                        } while (opsiKeuntungan != 3);
                         break;
                     case 4:
                         Clean.clearScreen();

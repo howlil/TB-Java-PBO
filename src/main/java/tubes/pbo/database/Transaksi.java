@@ -4,6 +4,7 @@ import tubes.pbo.database.data.DatabaseProduk;
 import tubes.pbo.database.data.DatabaseTransaksi;
 import tubes.pbo.database.template.TransaksiManajemen;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -19,28 +20,40 @@ public class Transaksi implements TransaksiManajemen {
     private Integer totalBeli;
     private String namaPembeli;
     private String noHp;
-    
 
+    
     @Override
-    public void cetakStruk() {
-         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String tanggal = formatter.format(new Date());
+public void cetakStruk() {
+    try {
+        ResultSet rs = dbTransaksi.getTransaksiTerakhir();
+        if (rs.next()) {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            System.out.println("======================================");
+            System.out.println("              Struk Belanja           ");
+            System.out.println("               KopiMas                ");
+            System.out.println("======================================");
+            System.out.println("Tanggal: " + formatter.format(rs.getTimestamp("tanggal")));
+            System.out.println("Nama Pembeli: " + rs.getString("namaPembeli"));
+            System.out.println("No HP: " + rs.getString("noHp"));
+            System.out.println("Total Beli: " + rs.getInt("totalBeli") + " item(s)");
+            System.out.println("Total Harga: Rp" + String.format("%.2f", rs.getDouble("totalHarga")));
 
-        System.out.println("======================================");
-        System.out.println("              Struk Belanja           ");
-        System.out.println("               KopiMas                ");
-        System.out.println("======================================");
-        System.out.println("Tanggal: " + tanggal);
-        System.out.println("Nama Pembeli: " + namaPembeli);
-        System.out.println("No HP: " + noHp);
-        System.out.println("Total Beli: " + totalBeli + " item(s)");
-        System.out.println("Total Harga: Rp" + String.format("%.2f", totalHarga));
-        System.out.println("======================================");
-        System.out.println("         Terima Kasih dan             ");
-        System.out.println("     Selamat Menikmati Kopi Anda      ");
-        System.out.println("======================================");
+            // Memformat informasi pembayaran
+            String informasiPembayaran = rs.getString("informasi_pembayaran").replace(", ", "\n");
+            System.out.println("Detail Pembayaran:\n" + informasiPembayaran);
+
+            System.out.println("======================================");
+            System.out.println("         Terima Kasih dan             ");
+            System.out.println("     Selamat Menikmati Kopi Anda      ");
+            System.out.println("======================================");
+        } else {
+            System.out.println("Tidak ada transaksi terakhir yang ditemukan.");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data transaksi terakhir: " + e.getMessage());
     }
-    
+}
+
 
     @Override
     public void buatTransaksi() {
@@ -50,36 +63,35 @@ public class Transaksi implements TransaksiManajemen {
         this.noHp = scanner.nextLine();
         System.out.print("ID Barang: ");
         int barangID = scanner.nextInt();
-        
+
         try {
             Produk produk = dbTransaksi.getBarangByID(barangID);
             if (produk == null) {
                 System.out.println("Barang tidak ditemukan.");
                 return;
             }
-            
+
             System.out.print("Jumlah Beli: ");
             this.totalBeli = scanner.nextInt();
             scanner.nextLine(); // Consume newline
-            if (produk.getStok() <  this.totalBeli) {
+            if (produk.getStok() < this.totalBeli) {
                 System.out.println("Stok tidak cukup.");
                 return;
             }
 
             // Mengurangi stok
-            int stokBaru = produk.getStok() -  this.totalBeli;
+            int stokBaru = produk.getStok() - this.totalBeli;
             dbTransaksi.updateBarangStok(barangID, stokBaru);
 
             // Menghitung total harga
-            this.totalHarga = produk.getHarga() *  this.totalBeli;
+            this.totalHarga = produk.getHarga() * this.totalBeli;
 
             // Menyimpan transaksi
-            String idPesan = dbTransaksi.simpanTransaksi(this.totalHarga,  this.totalBeli);
-            dbTransaksi.simpanTransaksiProduk(barangID, idPesan);
-            java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
-            dbTransaksi.simpanRiwayatTransaksi(idPesan, namaPembeli, produk.getNama_barang(), this.totalBeli, totalHarga, sqlDate);
-    
-    
+            String idPesan = dbTransaksi.simpanTransaksi(this.totalHarga, this.totalBeli);
+        dbTransaksi.simpanTransaksiProduk(barangID, idPesan);
+        java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+        dbTransaksi.simpanRiwayatTransaksi(idPesan, namaPembeli, this.noHp, produk.getNama_barang(), this.totalBeli, totalHarga, sqlDate);
+
             System.out.println("Transaksi berhasil disimpan.");
         } catch (SQLException e) {
             System.out.println("Gagal melakukan transaksi: " + e.getMessage());

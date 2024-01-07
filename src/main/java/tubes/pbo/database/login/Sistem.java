@@ -9,9 +9,8 @@ public class Sistem {
     private Pelanggan user;
     private Captcha captcha;
 
-    public Sistem(Admin admin,Pelanggan user) {
+    public Sistem(Admin admin) {
         this.admin = admin;
-        this.user = user;
         this.captcha = new Captcha();
     }
 
@@ -20,11 +19,13 @@ public class Sistem {
         try {
             System.out.print("username : ");
             String username = scanner.nextLine();
-    
+
             System.out.print("Password : ");
             String password = scanner.nextLine();
-    
-            if (admin.username.equals(username) && admin.password.equals(password) || user.username.equals(username) && user.password.equals(password)) {
+            boolean isAdminValid = admin != null && admin.username.equals(username) && admin.password.equals(password);
+            boolean isUserValid = user != null && user.username.equals(username) && user.password.equals(password);
+
+            if (isAdminValid || isUserValid) {
                 System.out.println("Masukkan captcha berikut: " + captcha.getCaptcha());
                 String captchaInput = scanner.nextLine();
     
@@ -38,5 +39,5 @@ public class Sistem {
             scanner.close(); // Memastikan scanner ditutup dalam kondisi apapun
         }
     }
-    
+
 }
