@@ -106,10 +106,42 @@ public void cetakStruk() {
             System.out.println("Gagal menampilkan riwayat transaksi: " + e.getMessage());
         }
     }
-
+    private void tampilkanTotalBarangTerjual() {
+        try {
+            int totalTerjual = dbTransaksi.hitungTotalBarangTerjual();
+            System.out.println("Total barang terjual: " + totalTerjual);
+        } catch (SQLException e) {
+            System.out.println("Gagal menghitung total barang terjual: " + e.getMessage());
+        }
+    }
+    public void hitungDanSimpanKeuntungan() {
+        try {
+            // Misalkan Anda memiliki metode untuk mendapatkan daftar barang terjual dengan jumlahnya
+            Map<Integer, Integer> barangTerjual = dbTransaksi.getDaftarBarangTerjual();
+            for (Map.Entry<Integer, Integer> entry : barangTerjual.entrySet()) {
+                int idBarang = entry.getKey();
+                int jumlahTerjual = entry.getValue();
+                Produk produk = dbTransaksi.getBarangByID(idBarang);
+                if (produk != null) {
+                    double keuntungan = jumlahTerjual * produk.getHarga() * 0.3; // 30% dari total harga
+                    dbTransaksi.simpanKeuntungan(idBarang, keuntungan);
+                }
+            }
+            System.out.println("Keuntungan telah disimpan untuk semua barang terjual.");
+        } catch (SQLException e) {
+            System.out.println("Gagal menghitung dan menyimpan keuntungan: " + e.getMessage());
+        }
+    }
     @Override
     public void keuntungan() {
-
+        try {
+            double totalKeuntungan = dbTransaksi.hitungKeuntungan();
+            System.out.printf("Total keuntungan: Rp%.2f\n", totalKeuntungan);
+            tampilkanTotalBarangTerjual();
+            hitungDanSimpanKeuntungan();
+        } catch (SQLException e) {
+            System.out.println("Gagal menghitung keuntungan: " + e.getMessage());
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package tubes.pbo.database.data;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +44,13 @@ public class DatabaseTransaksi {
         }
         return null;
     }
-    public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String noHp, String namaProduk, int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
-        String informasiPembayaran = String.format("Produk: %s, Jumlah: %d, Total Harga: %.2f", namaProduk, totalBeli, totalHarga);
+
+    public void simpanRiwayatTransaksi(String idPesan, String namaPembeli, String noHp, String namaProduk,
+            int totalBeli, double totalHarga, java.sql.Date tanggal) throws SQLException {
+        String informasiPembayaran = String.format("Produk: %s, Jumlah: %d, Total Harga: %.2f", namaProduk, totalBeli,
+                totalHarga);
         String query = "INSERT INTO riwayat_transaksi (id_pesan, namaPembeli, noHp, tanggal, informasi_pembayaran) VALUES (?, ?, ?, ?, ?);";
-    
+
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, idPesan);
             pstmt.setString(2, namaPembeli);
@@ -56,7 +60,6 @@ public class DatabaseTransaksi {
             pstmt.executeUpdate();
         }
     }
-  
 
     public void tampilkanSemuaRiwayatTransaksi() throws SQLException {
         String query = "SELECT * FROM riwayat_transaksi;";
@@ -64,10 +67,10 @@ public class DatabaseTransaksi {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 System.out.println("ID Riwayat: " + rs.getString("id_riwayat") +
-                                   ", ID Pesan: " + rs.getString("id_pesan") +
-                                   ", Nama Pembeli: " + rs.getString("namaPembeli") +
-                                   ", Tanggal: " + rs.getDate("tanggal") +
-                                   ", Info Pembayaran: " + rs.getString("informasi_pembayaran"));
+                        ", ID Pesan: " + rs.getString("id_pesan") +
+                        ", Nama Pembeli: " + rs.getString("namaPembeli") +
+                        ", Tanggal: " + rs.getDate("tanggal") +
+                        ", Info Pembayaran: " + rs.getString("informasi_pembayaran"));
             }
         }
     }
@@ -77,8 +80,7 @@ public class DatabaseTransaksi {
         PreparedStatement pstmt = connection.prepareStatement(query);
         return pstmt.executeQuery();
     }
-    
-    
+
     public void simpanTransaksiProduk(int idBarang, String idPesan) throws SQLException {
         String query = "INSERT INTO transaksi_produk (id_barang, id_pesan) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -105,6 +107,62 @@ public class DatabaseTransaksi {
         }
     }
 
+    public double hitungKeuntungan() throws SQLException {
+        String query = "SELECT tp.id_barang, tp.id_pesan, p.harga, COUNT(tp.id_barang) as jumlah_terjual FROM transaksi_produk tp JOIN produk p ON tp.id_barang = p.id_barang GROUP BY tp.id_barang;";
+        double totalKeuntungan = 0.0;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int jumlahTerjual = rs.getInt("jumlah_terjual");
+                double harga = rs.getDouble("harga");
+                totalKeuntungan += jumlahTerjual * harga * 0.3; // 30% dari total harga
+            }
+        }
+        return totalKeuntungan;
+    }
+    public Map<Integer, Integer> getDaftarBarangTerjual() throws SQLException {
+        Map<Integer, Integer> barangTerjual = new HashMap<>();
+        String query = "SELECT tp.id_barang, SUM(t.totalBeli) as jumlah_terjual FROM transaksi_produk tp JOIN transaksi t ON tp.id_pesan = t.id_pesan GROUP BY tp.id_barang;";
+    
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int idBarang = rs.getInt("id_barang");
+                int jumlahTerjual = rs.getInt("jumlah_terjual");
+                barangTerjual.put(idBarang, jumlahTerjual);
+            }
+        }
+        return barangTerjual;
+    }
+    
+
+
+    public int hitungTotalBarangTerjual() throws SQLException {
+        String query = "SELECT SUM(totalBeli) as total_terjual FROM transaksi;";
+        int totalTerjual = 0;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                totalTerjual = rs.getInt("total_terjual");
+            }
+        }
+        return totalTerjual;
+    }
+
+    public void simpanKeuntungan(int idBarang, double jumlahKeuntungan) throws SQLException {
+        String query = "INSERT INTO keuntungan (id_barang, jumlah_keuntungan, tanggal) VALUES (?, ?, ?);";
+        java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, idBarang);
+            pstmt.setDouble(2, jumlahKeuntungan);
+            pstmt.setDate(3, sqlDate);
+            pstmt.executeUpdate();
+        }
+    }
+
     public void buatTransaksi(int barangId, int jumlahBeli, String namaPembeli) throws SQLException {
         connection.setAutoCommit(false);
         Savepoint savepoint = connection.setSavepoint();
@@ -123,7 +181,6 @@ public class DatabaseTransaksi {
             updateBarangStok(barangId, stokBaru);
 
             double totalHarga = produk.getHarga() * jumlahBeli;
-
 
             connection.commit();
         } catch (SQLException e) {
